@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Stopwatch</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main class="stopwatch-container">
+
+        <!-- Left section: Timer and buttons -->
+        <section class="timer-section">
+            <div id="mainTimer" class="main-timer">
+                00:00:00
+            </div>
+
+            <div class="button-container">
+                <button id="startStopButton" class="control-button primary">
+                    Start
+                </button>
+                <button id="lapResetButton" class="control-button secondary">
+                    Lap
+                </button>
+            </div>
+
+        </section>
+
+
+        <!-- Right section: Lap records -->
+        <section class="lap-section">
+
+            <div class="lap-header">
+                <span>Activity</span>
+                <span>Time</span>
+            </div>
+
+            <div id="lapList" class="lap-list">
+                <!--
+                    Lap records will be inserted here dynamically.
+                    Example:
+                    <div class="lap-item">
+                        <span class="lap-name">
+                            Lap 1
+                        </span>
+                        <span class="lap-time">
+                            00:00:12.34
+                        </span>
+                    </div>
+                -->
+            </div>
+        </section>
+    </main>
+
+
+
+    <!-- Reset confirmation modal -->
+    <div id="resetModal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <h2>
+                Reset Stopwatch?
+            </h2>
+
+            <p>
+                This will permanently erase:
+            </p>
+
+            <ul>
+                <li>Main timer</li>
+                <li>All lap records</li>
+                <li>Activity names</li>
+            </ul>
+
+            <div class="modal-buttons">
+                <button id="cancelResetButton"
+                        class="modal-button cancel">
+                    Cancel
+                </button>
+
+                <button id="confirmResetButton"
+                        class="modal-button confirm">
+                    Reset
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>
