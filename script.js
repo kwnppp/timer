@@ -1,7 +1,29 @@
+console.log("SCRIPT STARTED");
+
+const supabase = createClient(
+    "https://pqojvxbteermfwoeejtq.supabase.co",
+    "sb_publishable_DBXZI8UOQQr1kxdZgSskxg_z0qd9jD-"
+);
+
 
 // ===============================
 // Stopwatch variables
 // ===============================
+let currentUser = null;
+async function checkUser(){
+
+    const {data} =
+        await supabase.auth.getUser();
+
+    currentUser =
+        data.user;
+
+    console.log(currentUser);
+
+}
+
+checkUser();
+
 
 
 let running = false;
@@ -11,6 +33,7 @@ let lastLapTime = 0;
 let animationFrame;
 
 let laps = [];
+
 
 
 
@@ -95,6 +118,8 @@ function updateTimer(){
 // ===============================
 // Start / Stop
 // ===============================
+let sessionStart = null;
+
 function startTimer(){
     running=true;
     startTime =
@@ -102,7 +127,10 @@ function startTimer(){
     updateTimer();
     startStopButton.textContent="Stop";
     lapResetButton.textContent="Lap";
+
+    sessionStart = new Date();
 }
+
 
 
 
@@ -133,18 +161,43 @@ startStopButton.onclick=function(){
 // ===============================
 // Lap function
 // ===============================
-function recordLap(){
-    let lapDuration =
-        elapsedTime - lastLapTime;
-    lastLapTime =
-        elapsedTime;
-    laps.unshift({
+async function recordLap(){
+    let lapDuration = elapsedTime - lastLapTime;
+
+    lastLapTime = elapsedTime;
+
+    const lap = {
+        user_id:
+        currentUser.id,
+
         name:
         `Lap ${laps.length+1}`,
 
-        time:
-        lapDuration
-    });
+        duration:
+        lapDuration,
+
+        start_time:
+        sessionStart,
+
+        end_time:
+        new Date()
+    };
+
+    const {error} = 
+        await supabase
+        .from("laps")
+        .insert(lap);
+
+    if(error){
+        console.error(
+            "Saving lap failed:",
+            error
+        );
+
+        return;
+    }
+
+    laps.unshift(lap);
 
     renderLaps();
 }
@@ -189,7 +242,7 @@ function renderLaps(){
         time.className="lap-time";
         time.textContent =
         formatTime(
-            lap.time,
+            lap.duration,
             true
         );
 
@@ -202,6 +255,33 @@ function renderLaps(){
 }
 
 
+
+
+async function loadLaps(){
+
+    const {data,error} =
+        await supabase
+        .from("laps")
+        .select("*")
+        .order(
+            "created_at",
+            {ascending:false}
+        );
+
+
+    if(error){
+
+        console.error(error);
+        return;
+
+    }
+
+
+    laps=data;
+
+    renderLaps();
+
+}
 
 
 
@@ -222,12 +302,43 @@ function enableEditing(element,lap){
         element.replaceWith(input);
         input.focus();
 
-        function save(){
-            lap.name =
+    async function save(){
+
+        const newName =
             input.value || lap.name;
 
-            renderLaps();
-        }
+
+        lap.name =
+            newName;
+
+
+        const { error } =
+            await supabase
+            .from("laps")
+            .update({
+                name: newName
+            })
+            .eq(
+                "id",
+                lap.id
+            );
+
+
+        if(error){
+
+            console.error(
+                "Updating name failed:",
+                error
+            );
+
+            return;
+
+    }
+
+
+    renderLaps();
+
+}
 
         input.onkeydown=function(e){
             if(e.key==="Enter"){
@@ -257,16 +368,47 @@ cancelResetButton.onclick=
 closeResetModal;
 
 
-confirmResetButton.onclick=function(){
+confirmResetButton.onclick = async function(){
+
+    const { error } =
+        await supabase
+        .from("laps")
+        .delete()
+        .eq(
+            "user_id",
+            currentUser.id
+        );
+
+
+    if(error){
+
+        console.error(
+            "Deleting laps failed:",
+            error
+        );
+
+        return;
+
+    }
+
+
     elapsedTime=0;
+
     lastLapTime=0;
+
     laps=[];
 
-    mainTimer.textContent=
+
+    mainTimer.textContent =
     "00:00:00";
-    lapList.innerHTML="";
-    
+
+
+    lapList.innerHTML =
+    "";
+
+
     closeResetModal();
+
 };
 
 
@@ -290,3 +432,23 @@ function(e){
         closeResetModal();
     }
 });
+
+
+
+
+async function testConnection(){
+
+    const {data,error} =
+        await supabase
+        .from("laps")
+        .select("*");
+
+
+    console.log("Data:", data);
+
+    console.log("Error:", error);
+
+}
+
+
+testConnection();
