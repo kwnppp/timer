@@ -5,6 +5,9 @@ const db = supabase.createClient(
     "sb_publishable_DBXZI8UOQQr1kxdZgSskxg_z0qd9jD-"
 );
 
+console.log("supabase global:", supabase);
+console.log("db object:", db);
+
 
 // ===============================
 // Stopwatch variables
