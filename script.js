@@ -184,7 +184,7 @@ async function recordLap(){
     };
 
     const {error} = 
-        await supabase
+        await db
         .from("laps")
         .insert(lap);
 
@@ -313,7 +313,7 @@ function enableEditing(element,lap){
 
 
         const { error } =
-            await supabase
+            await db
             .from("laps")
             .update({
                 name: newName
@@ -371,7 +371,7 @@ closeResetModal;
 confirmResetButton.onclick = async function(){
 
     const { error } =
-        await supabase
+        await db
         .from("laps")
         .delete()
         .eq(
@@ -439,7 +439,7 @@ function(e){
 async function testConnection(){
 
     const {data,error} =
-        await supabase
+        await db
         .from("laps")
         .select("*");
 
