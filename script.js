@@ -1,6 +1,6 @@
 console.log("SCRIPT STARTED");
 
-const supabase = createClient(
+const db = supabase.createClient(
     "https://pqojvxbteermfwoeejtq.supabase.co",
     "sb_publishable_DBXZI8UOQQr1kxdZgSskxg_z0qd9jD-"
 );
