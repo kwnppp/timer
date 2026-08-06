@@ -13,7 +13,7 @@ let currentUser = null;
 async function checkUser(){
 
     const {data} =
-        await supabase.auth.getUser();
+        await db.auth.getUser();
 
     currentUser =
         data.user;
@@ -260,7 +260,7 @@ function renderLaps(){
 async function loadLaps(){
 
     const {data,error} =
-        await supabase
+        await db
         .from("laps")
         .select("*")
         .order(
